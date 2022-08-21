@@ -1,35 +1,38 @@
-import { useState } from "react";
-import styled from "styled-components";
+import { useState } from 'react';
+import styled from 'styled-components';
 
 function MovieForm() {
+  const [errors, setErrors] = useState([]);
   const [formData, setFormData] = useState({
-    title: "",
+    title: '',
     year: new Date().getFullYear(),
-    length: "0",
-    director: "",
-    description: "",
-    poster_url: "",
-    category: "",
+    length: '0',
+    director: '',
+    description: '',
+    poster_url: '',
+    category: '',
     discount: false,
     female_director: false,
   });
 
   function handleSubmit(e) {
     e.preventDefault();
-    fetch("/movies", {
-      method: "POST",
+    fetch('/movies', {
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(formData),
     })
-      .then((response) => response.json())
-      .then((newMovie) => console.log(newMovie));
+      .then((data) => data.json())
+      .then((data) => {
+        data.ok ? console.log('Movie created:', data) : setErrors(data.errors);
+      });
   }
 
   function handleChange(e) {
     const value =
-      e.target.type === "checkbox" ? e.target.checked : e.target.value;
+      e.target.type === 'checkbox' ? e.target.checked : e.target.value;
     setFormData({
       ...formData,
       [e.target.id]: value,
@@ -38,6 +41,13 @@ function MovieForm() {
 
   return (
     <Wrapper>
+      {errors.length > 0 && (
+        <ul style={{ color: 'red' }}>
+          {errors.map((error) => (
+            <li key={error}>{error}</li>
+          ))}
+        </ul>
+      )}
       <form onSubmit={handleSubmit}>
         <FormGroup>
           <label htmlFor="title">Title</label>
